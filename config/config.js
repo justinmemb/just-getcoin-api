@@ -15,7 +15,8 @@ var configuration = {
 
             email: 'testpariharrohit@gmail.com',
             password: 'Test@123',
-            service: 'gmail'
+            service: 'gmail',
+            feedbackemail: 'devpariharrohit2015@gmail.com',
         }
     },
     production: {
@@ -33,7 +34,8 @@ var configuration = {
 
             email: 'testpariharrohit@gmail.com',
             password: 'Test@123',
-            service: 'gmail'
+            service: 'gmail',
+            feedbackemail: 'devpariharrohit2015@gmail.com',
         }
     }
 };

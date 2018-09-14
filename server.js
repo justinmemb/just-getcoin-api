@@ -27,19 +27,16 @@ var mongoose =require('mongoose');
 
 //Mongodb database path
 var databaseURI = configuration.database.url;
-mongoose.connect(databaseURI).then(() => {
-
-    console.log('Connected to MongoDB at', databaseURI);
-}).catch(error => {
-
-    console.log('Database connection error: '+ error.message);
-})
+mongoose.connect(databaseURI).then(() => { console.log('Connected to MongoDB at', databaseURI); }).catch(error => { console.log('Database connection error: '+ error.message); })
 
 //Created model load
 var usersModel  = require('./api/models/users.js');
+var feedbacksModel  = require('./api/models/feedbacks.js');
+var notificationsModel  = require('./api/models/notifications.js');
+var offersModel  = require('./api/models/offers.js');
 
 //Importing router
-var usersRoute  = require('./api/routes/users.js');
+var usersRoute  = require('./api/routes/routes.js');
 usersRoute(app);
 
 //Messages
@@ -48,8 +45,6 @@ var message = require('./api/messages.js');
 //An error handling middleware
 app.use(function(error, request, response) {
 
-    console.log(error);
-    response.status(500);
     response.json({
 
         "error" : true,
@@ -59,8 +54,6 @@ app.use(function(error, request, response) {
 
 app.use(function(error, request, response, next) {
 
-    console.log(error);
-    response.status(404);
     response.json({
 
         "error" : true,
