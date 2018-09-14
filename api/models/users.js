@@ -1,27 +1,41 @@
 'use strict';
 var mongoose = require('mongoose');
+require('mongoose-double')(mongoose);
+var SchemaTypes = mongoose.Schema.Types;
 
 //users
 var userSchema = mongoose.Schema({
-    firstName:{
+    name:{
         type: String,
-        required: "First name field cann't be empty."
     },
-    lastName:{
+    email:{
         type: String,
-        required: "Last name field cann't be empty."
     },
     mobile:{
         type: String,
         required: "Mobile number field cann't be empty."
     },
-    email:{
-        type: String,
-        required: "Email field cann't be empty."
-    },
     password:{
         type: String,
         required: "Password field cann't be empty."
+    },
+    image: {
+        type: String,
+    },
+    location: {
+        type: SchemaTypes.Double,
+    },
+    latitude: {
+        type: SchemaTypes.Double,
+    },
+    longitude: {
+        type: SchemaTypes.Double,
+    },
+    language: {
+        type: String,
+    },
+    pin: {
+        type: String,
     },
     created_at: {
         type: Date,

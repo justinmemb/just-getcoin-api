@@ -1,4 +1,4 @@
-var config = {
+var configuration = {
 
     development: {
         app: {
@@ -10,7 +10,7 @@ var config = {
             port: 8585,
         }, database: {
 
-            url: 'mongodb://parihar:parihar@getcoins-shard-00-00-ags2s.mongodb.net:27017,getcoins-shard-00-01-ags2s.mongodb.net:27017,getcoins-shard-00-02-ags2s.mongodb.net:27017/test?ssl=true&replicaSet=getcoins-shard-0&authSource=admin' //'mongodb://localhost/getcoins', //'mongodb+srv://parihar:parihar@getcoins-ags2s.mongodb.net/getcoins'
+            url: 'mongodb://localhost/getcoins'
         }, mail: {
 
             email: 'testpariharrohit@gmail.com',
@@ -38,4 +38,4 @@ var config = {
     }
 };
 
-module.exports = config[process.env.NODE_ENV] || config.development;
+module.exports = configuration[process.env.NODE_ENV] || configuration.development;

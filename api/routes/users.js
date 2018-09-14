@@ -8,85 +8,6 @@
 // var config = require('../../config/config.js');
 //
 // var ObjectId = mongoose.Types.ObjectId; //Define ObjectId
-//
-// router.get('/login', function(request, response, next) {
-//
-//     next();
-// });
-//
-// router.post('/login', function(request, response, next) {
-//
-//     users.find({email:request.body.email, password:request.body.password}, function(error, user) {
-//
-//         if (error) {
-//
-//             next();
-//         } else {
-//
-//             if (user.length) {
-//
-//                 //user exists
-//                 response.json({
-//
-//                     error: false,
-//                     user: user
-//                 });
-//             } else {
-//
-//                 //user not exists
-//                 response.json({
-//
-//                     error: true,
-//                     message: "Login failed. Incorrect credentials."
-//                 });
-//             }
-//         }
-//     });
-// });
-//
-// router.get('/register', function(request, response, next) {
-//
-//     next();
-// });
-//
-// router.post('/register', function(request, response, next) {
-//
-//     users.findOne({email:request.body.email}, function(error, user) {
-//
-//         if (!error && user) {
-//
-//             response.json({
-//
-//                 error: true,
-//                 message : "User already exists with this email address. Login now!"
-//             });
-//         } else {
-//
-//             var new_user = new users(request.body);
-//             new_user.save(function(error, user) {
-//
-//                 if (error) {
-//
-//                     response.json({
-//
-//                         error: true,
-//                         error: error.message
-//                     });
-//                 }
-//                 else {
-//
-//                     email.sendHtmlEmail(request.body.email, 'Welcome to '+config.app.name+'!', '<table width="100%" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="center"> <table width="500" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td colspan="2" height="15" align="center" style="font-size:1px;line-height:1px;">&nbsp;</td> </tr> <tr> <td colspan="2" height="15" align="center" style="font-size:1px;line-height:1px;">&nbsp;</td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table width="100%" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0"> <tbody> <tr> <td> <table width="500" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="center"> <table width="420" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> <tr> <td align="left" valign="top" style="font-size:17px; line-height:24px; font-family:Helvetica Neue, Arial, sans-serif; color:#666666; font-weight:normal;"> <a href="'+config.app.url+'" style="color: #4585f3; text-decoration:none" class="hover" target="_blank" rel="external">'+config.app.name+'</a> is a mobile cross-platform application that allows users to exchange FIAT for cryptocurrencies and viceversa using the nearby function like localbitcoins you can see the offers around you and pick your one.</td> </tr> <tr> <td align="left" height="15" valign="top" style="border-top:1px solid #e6e6e6;font-size:1px; line-height:1px;">&nbsp;</td> </tr> <tr> <td align="center" valign="top" style="font-size:17px; line-height:26px; font-family:Helvetica Neue, Arial, sans-serif; color:#666666; font-weight:normal;">Thank you for using '+config.app.name+'!</td> </tr> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table align="center" width="100%" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0"> <tbody> <tr> <td align="center"> <table width="500" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> <tr> <td align="center" valign="top" style="font-family: Helvetica, arial, sans-serif; font-size: 13px; line-height: 20px;color: #7f7f7f; padding-left: 45px; padding-right: 45px">© 2018 '+config.app.name+'</td> </tr> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> </tbody> </table> </td> </tr> </tbody> </table>');
-//
-//                     response.json({
-//
-//                         error: false,
-//                         message: 'User successfully created.'
-//                     });
-//                 }
-//             });
-//         }
-//     });
-// });
 
 // router.get('/forgotpassword', function(request, response, next) {
 //
@@ -201,6 +122,16 @@ var users = require('../controllers/users.js');
 
 module.exports = function(app) {
 
-    //user registration
-    app.route('/register').post(users.user_registeration);
+    //Registration
+    app.route('/register').post(users.registeration);
+
+    //Login
+    app.route('/mobile_login').get(users.mobileLogin);
+    app.route('/email_login').get(users.emailLogin);
+
+    //Forgot Password
+    app.route('/forgot_password').post(users.forgotPassword);
+
+    //User Listing
+    app.route('/user_list').post(users.userList);
 };
