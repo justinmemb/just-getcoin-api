@@ -3,7 +3,7 @@ var express = require('express');
 var app = express();
 
 //Configuration
-var configuration = require('./resources/config.js');
+var config = require('./config/config.js');
 
 //Body-parser
 //For parsing JSON and url-encoded data
@@ -15,85 +15,43 @@ app.use(bodyParser.urlencoded({
 }));
 
 //For parsing application/json
-app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/x-www-form-urlencoded' }));
-
-//Seting up server to accept cross-origin browser requests
-app.use(function(request, response, next) {
-    //Allow cross origin requests
-    response.setHeader("Access-Control-Allow-Methods", "POST, PUT, OPTIONS, DELETE, GET");
-    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    response.header("Access-Control-Allow-Credentials", true);
-    next();
-});
-
-//Static files
-app.use(express.static('public'));
-
-//Set it as the templating engine
-app.set('view engine', 'ejs');
-app.set('views', './views');
-
-//Express-session
-var session = require('express-session');
-app.use(session({secret: 'its a secret!'})); //Express-Session middleware
 
 //Mongodb
 //For document Modeling in Node for MongoDB
 var mongoose =require('mongoose');
 
 //Mongodb database path
-var databaseURI = configuration.database.url;
-mongoose.connect(databaseURI).then(() => { console.log('Connected to MongoDB at', databaseURI); }).catch(error => { console.log('Database connection error: '+ error.message); })
+var databaseURI = config.database.url;
+mongoose.connect(databaseURI).then(() => {
 
-//Morgan
-//For logging network requests
-var morgan  = require('morgan')
-app.use(morgan('dev'));
+    console.log('Connected to MongoDB at', databaseURI);
+}).catch(error => {
+
+    console.log('Database connection error: '+ error.message);
+})
 
 //Created model load
-var usersModel = require('./api/models/users.js');
-var feedbacksModel = require('./api/models/feedbacks.js');
-var notificationsModel = require('./api/models/notifications.js');
-var offersModel = require('./api/models/offers.js');
-var cryptoCurrenciesModel = require('./api/models/cryptocurrencies.js');
-var chatsModel = require('./api/models/chats.js');
-var dealsModel = require('./api/models/deals.js');
-var walletsModel = require('./api/models/wallets.js');
+var usersModel  = require('./api/models/users.js');
 
 //Importing router
-var adminRoute = require('./admin/admin.js');
-app.use('/admin', adminRoute);
-
-//Importing router
-var usersRoute  = require('./api/routes/routes.js');
+var usersRoute  = require('./api/routes/users.js');
 usersRoute(app);
-
-//Messages
-var message = require('./resources/messages.js');
 
 //An error handling middleware
 app.use(function(error, request, response) {
 
-    response.json({
-
-        "error" : true,
-        "error_description" : error.message,
-        "message" : message.somethingWrong
-    });
+    response.status(500);
+    response.send("Oops! Something want wrong.");
 });
 
 app.use(function(error, request, response, next) {
 
-    response.json({
-
-        "error" : true,
-        "error_description" : error.message,
-        "message" : message.invalidURL
-    });
+    response.status(404);
+    response.send("Invalid URL, Try with correct HTTP Method!");
 });
 
-app.listen(process.env.PORT || configuration.server.port, function(){
+app.listen(process.env.PORT || config.server.port, function(){
 
-    console.log('"Get Coins" server listening on port '+ configuration.server.port);
+    console.log('"Get Coins" server listening on port '+ config.server.port);
 });
