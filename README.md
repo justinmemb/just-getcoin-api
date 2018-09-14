@@ -1,4 +1,4 @@
-# GetCoins Application
+# GetConis Application
 
 The idea is to develop a mobile cross-platform application that allows users to exchange FIAT for cryptocurrencies and viceversa using the nearby function like local bitcoins you can see the offers around you and pick your one.
 
@@ -155,7 +155,7 @@ With User
 * URL: BASEURL/api/users/update/location/
 * HTTP Methods: POST
 * PARAMETERS:  user_id:[return in response of login api]
-               location:10 Rue du Général Camou, 75007 Paris, France
+               location:10 Rue du GÃ©nÃ©ral Camou, 75007 Paris, France
                latitude:48.8583701
                longitude:2.2922926
 ```

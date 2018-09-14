@@ -17,7 +17,6 @@ var messages = {
     invalidPin: 'Invalid Pin, please enter correct pin!',
     successVerified: 'You are successfully verified!',
     invalidUser: 'Invalid User, You are not registered!',
-    inactiveUser: 'You are currently inactive!',
     feedSaved: 'Feedback successfully saved!',
     feedListed: 'Feedbacks successfully listed!',
     languageUpdated: 'Language successfully updated!',

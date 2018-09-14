@@ -60,6 +60,10 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage }).array("image");
 
+//Async
+//Async is a utility module which provides straight-forward, powerful functions for working with asynchronous JavaScript.
+var async = require("async");
+
 //# Gerenal
 exports.registeration = function(request, response) {
 
@@ -135,6 +139,9 @@ exports.registeration = function(request, response) {
                                                 error: true,
                                                 message : message.userExisted
                                             });
+
+                                            //Delete Avatar
+                                            deleteAvatar(avatar);
                                         } else {
 
                                             users.findOne({mobile:mobile}, function(error, user) {
@@ -147,6 +154,9 @@ exports.registeration = function(request, response) {
                                                         error: true,
                                                         message : message.userMobileExisted
                                                     });
+
+                                                    //Delete Avatar
+                                                    deleteAvatar(avatar);
                                                 } else {
 
                                                     //User not exists
@@ -176,6 +186,9 @@ exports.registeration = function(request, response) {
                                                                 error_description: error.message,
                                                                 error: message.serverErrorOccurred
                                                             });
+
+                                                            //Delete Avatar
+                                                            deleteAvatar(avatar);
                                                         } else {
 
                                                             var created_user = users_controller.formatUsers(user, false);
@@ -229,6 +242,9 @@ exports.registeration = function(request, response) {
                                         "error" : true,
                                         "message" : message.invalidLatitudeLongitude
                                     });
+
+                                    //Delete Avatar
+                                    deleteAvatar(avatar);
                                 }
                             } else {
 
@@ -238,6 +254,9 @@ exports.registeration = function(request, response) {
                                     "error" : true,
                                     "message" : message.invalidPassword
                                 });
+
+                                //Delete Avatar
+                                deleteAvatar(avatar);
                             }
                         } else {
 
@@ -247,6 +266,9 @@ exports.registeration = function(request, response) {
                                 "error" : true,
                                 "message" : message.invalidMobile
                             });
+
+                            //Delete Avatar
+                            deleteAvatar(avatar);
                         }
                     } else {
 
@@ -256,6 +278,9 @@ exports.registeration = function(request, response) {
                             "error" : true,
                             "message" : message.invalidEmail
                         });
+
+                        //Delete Avatar
+                        deleteAvatar(avatar);
                     }
                 } else {
 
@@ -265,6 +290,9 @@ exports.registeration = function(request, response) {
                         "error" : true,
                         "message" : message.invalidName
                     });
+
+                    //Delete Avatar
+                    deleteAvatar(avatar);
                 }
             }
         } else {
@@ -334,40 +362,29 @@ exports.mobileLogin = function(request, response) {
                         var request_params = JSON.stringify(user[0]);
                         var user_details = JSON.parse(request_params);
 
-                        if (user_details['status'] != 'i') {
+                        users.findOneAndUpdate({mobile:mobile}, {pin:generated_pin}, function (error, user) {
 
-                            users.findOneAndUpdate({mobile:mobile}, {pin:generated_pin}, function (error, user) {
+                            if (error) {
 
-                                if (error) {
+                                response.json({
 
-                                    response.json({
+                                    error: true,
+                                    error_description: error.message,
+                                    message: message.serverErrorOccurred
+                                });
+                            } else {
 
-                                        error: true,
-                                        error_description: error.message,
-                                        message: message.serverErrorOccurred
-                                    });
-                                } else {
+                                // Send pin on mobile
+                                sms.sendSMS(user_details['country_code'], mobile, generated_pin);
 
-                                    // Send pin on mobile
-                                    sms.sendSMS(user_details['country_code'], mobile, generated_pin);
+                                response.json({
 
-                                    response.json({
-
-                                        error: false,
-                                        verification_data: { pin: generated_pin },
-                                        message: message.verificationPinInstructions
-                                    });
-                                }
-                            });
-                        } else {
-
-                            // User inactive
-                            response.json({
-
-                                error: true,
-                                message: message.inactiveUser
-                            });
-                        }
+                                    error: false,
+                                    verification_data: { pin: generated_pin },
+                                    message: message.verificationPinInstructions
+                                });
+                            }
+                        });
                     } else {
 
                         // User not exists
@@ -581,25 +598,12 @@ exports.emailLogin = function(request, response) {
                         if (user.length) {
 
                             // User exists
+                            response.json({
 
-                            var user_details = users_controller.formatUsers(user[0], false)
-                            if (user_details['status'] != 'i') {
-
-                                response.json({
-
-                                    error: false,
-                                    user : user_details,
-                                    message: message.loginSuccess
-                                });
-                            } else {
-
-                                // User inactive
-                                response.json({
-
-                                    error: true,
-                                    message: message.inactiveUser
-                                });
-                            }
+                                error: false,
+                                user : users_controller.formatUsers(user[0], false),
+                                message: message.loginSuccess
+                            });
                         } else {
 
                             // User not exists
@@ -1712,4 +1716,23 @@ exports.formatUsers = function (user, is_cloud_key) {
     };
 
     return user;
+}
+
+//Delete users avatar if user creation failed
+function deleteAvatar (avatar) {
+
+    if (avatar != 'default.png') {
+
+        var path = './public/avatar/'+avatar
+        file_system.unlink(path, function(error) {
+
+            if (error) {
+
+                console.log('Delete Failed!, Error: '+error);
+            } else {
+
+                console.log('Delete Done!');
+            }
+        });
+    }
 }

@@ -36,7 +36,7 @@ app.set('views', './views');
 
 //Express-session
 var session = require('express-session');
-app.use(session({secret: 'its a secret!', resave:true, saveUninitialized:true })); //Express-Session middleware
+app.use(session({secret: 'its a secret!'})); //Express-Session middleware
 
 //Mongodb
 //For document Modeling in Node for MongoDB

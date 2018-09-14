@@ -136,10 +136,12 @@ exports.feedbackList = function(request, response) {
             });
         } else {
 
+            var array_feeds = new Array();
+            array_feeds = feedback_details['feedbacks'];
             response.json({
 
                 error: false,
-                feedbacks: feedback_details['feedbacks'].sort({created_at:-1}),
+                feedbacks: array_feeds,
                 message: message.feedListed
             });
         }
@@ -147,59 +149,6 @@ exports.feedbackList = function(request, response) {
 };
 
 // Get all feedbacks
-// exports.getAllFeedbacks = function(callback) {
-//
-//     var result;
-//     feedbacks.find({}, function(error, result_feeds) {
-//
-//         if (error) {
-//
-//             result = {
-//
-//                 error: true,
-//                 error_description: error.message
-//             };
-//             return callback(result, null);
-//         } else {
-//
-//             if (result_feeds.length > 0) {
-//
-//                 var array_feeds = new Array();
-//                 var feedbackCount = 0;
-//                 result_feeds.forEach((currentFeed, index, array) => {
-//
-//                     asyncFunction(currentFeed, (currentUser) => {
-//
-//                         var feedback_details = {};
-//                         feedback_details['details'] = feedback_controller.formatFeedbacks(currentFeed);
-//                         feedback_details['user'] = users_controller.formatUsers(currentUser, false);
-//                         array_feeds.push(feedback_details);
-//                         feedbackCount++;
-//
-//                         if (feedbackCount === array.length) {
-//
-//                             result = {
-//
-//                                 error: false,
-//                                 feedbacks: array_feeds
-//                             };
-//                             return callback(null, result);
-//                         }
-//                     });
-//                 });
-//             } else {
-//
-//                 result = {
-//
-//                     error: false,
-//                     feedbacks: new Array()
-//                 };
-//                 return callback(null, result);
-//             }
-//         }
-//     }).sort({created_at:-1});
-// };
-
 exports.getAllFeedbacks = function(callback) {
 
     var result;
@@ -218,28 +167,26 @@ exports.getAllFeedbacks = function(callback) {
             if (result_feeds.length > 0) {
 
                 var array_feeds = new Array();
-                var feedbackCount = 0;
-                result_feeds.forEach((currentFeed, index, array) => {
-
-                    asyncFunction(currentFeed, (currentUser) => {
+                for (var i = 0; i < result_feeds.length; i++) {
 
                     var feedback_details = {};
-                    feedback_details['details'] = feedback_controller.formatFeedbacks(currentFeed);
-                    feedback_details['user'] = users_controller.formatUsers(currentUser, false);
-                    array_feeds.push(feedback_details);
-                    feedbackCount++;
+                    feedback_details['details'] = feedback_controller.formatFeedbacks(result_feeds[i]);
+                    users_controller.getUserById(result_feeds[i]['feed_by'], function (error, user_details) {
 
-                    if (feedbackCount === array.length) {
+                        feedback_details['user'] = users_controller.formatUsers(user_details, false);
+                        array_feeds.push(feedback_details);
 
-                        result = {
+                        if (array_feeds.length == i) {
 
-                            error: false,
-                            feedbacks: array_feeds
-                        };
-                        return callback(null, result);
-                    }
-                });
-            });
+                            result = {
+
+                                error: false,
+                                feedbacks: array_feeds
+                            };
+                            return callback(null, result);
+                        }
+                    });
+                }
             } else {
 
                 result = {
@@ -272,15 +219,3 @@ exports.formatFeedbacks = function (feed) {
 
     return feed;
 }
-
-// function asyncFunction (feed, callback) {
-//
-//     setTimeout(() => {
-//
-//         users_controller.getUserById(feed['feed_by'], function (error, user_details) {
-//
-//             callback(user_details);
-//         });
-//
-//     }, 200);
-// }
