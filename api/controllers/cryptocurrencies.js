@@ -49,7 +49,9 @@ exports.createCryptoCurrencies = function(request, response) {
 
            
 
-            if (functions.isValidString(currency_symbol)) {
+            if (functions.isValidString(currency_symbol))   {
+
+               30.
 
                 cryptocurrencies.findOne({currency:currency}, function(error, result_currency) {
 
@@ -135,25 +137,21 @@ exports.listCryptoCurrencies = function(request, response) {
             error_description: error.message,
             message: message.serverErrorOccurred
         });
-    } else{
+    } else {
+        var array_currencies = new Array();
+        for (var i = 0; i < currencies.length; i++) {
+
+            array_currencies.push(formatCurrencies(currencies[i]));
+        }
+
+        response.json({
+
+            error: false,
+            currencies: array_currencies,
+            message: message.currencyListed
+        });
+    }
+});
+}; 
        
         
-
-
-        
-    } 
-
-
-   
-    
-
-
-
-}
-
-
-
-
-
-
-
