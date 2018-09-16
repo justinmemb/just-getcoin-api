@@ -1,6 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
 var schemaTypes = mongoose.Schema.Types;
+var GeoJSON  = require('geojson'); //GeoJSON is a format for encoding a variety of geographic data structures.
 
 //offers
 var offersSchema = mongoose.Schema({
@@ -13,26 +14,18 @@ var offersSchema = mongoose.Schema({
 
         type: String,
     },
-    offer_amount: {
+    quantity: {
 
         type: schemaTypes.Double,
-        required: "Amount cann't be empty."
+        required: "Quantity cann't be empty."
     },
-    offer_currency: {
+    currency: {
 
-        type: [{
-            type: String,
-            enum: ['Bitcoin', 'Litecoin', 'Namecoin', 'SwiftCoin', 'Bytecoin']
-        }],
-        default: ['Bitcoin']
+        type: String,
     },
-    offer_unit: {
+    unit: {
 
-        type: [{
             type: String,
-            enum: ['BTC', 'LTC', 'NMC', 'STC', 'BCN']
-        }],
-        default: ['BTC']
     },
     offer_type: {
 
@@ -42,7 +35,39 @@ var offersSchema = mongoose.Schema({
         }],
         default: ['s']
     },
+    exchange_rate: {
+
+        type: schemaTypes.Double,
+        required: "Exchnage rate cann't be empty."
+    },
+    location: {
+
+        type: String,
+    },
+    latitude: {
+
+        type: schemaTypes.Double,
+    },
+    longitude: {
+
+        type: schemaTypes.Double,
+    },
+    type: {
+
+        type: String,
+        enum: [
+            'Point',
+            'LineString',
+            'Polygon'
+        ],
+        default: ['Point']
+    },
+    coordinates: {
+
+        type: [Number],
+    },
     status: {
+
         type: [{
             type: String,
             enum: ['p', 'a', 'r']

@@ -23,6 +23,11 @@ var messages = {
     notificationListed: 'Notifications successfully listed!',
     offerListed: 'Offers successfully listed!',
     offerCreated: 'Offer successfully created!',
+    currencyExisted: 'Currency already exists!',
+    currencyCreated: 'Currency successfully created!',
+    currencyListed: 'Currencies successfully listed!',
+    invalidCurrency: 'Invalid Currency!',
+    marketPriceListed: ' Market prices are successfully listed!',
 };
 
 module.exports = messages;

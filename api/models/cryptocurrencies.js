@@ -1,5 +1,4 @@
 'use strict';
-//Models
 var mongoose = require('mongoose');
 
 // cryptocurrencies
@@ -8,20 +7,21 @@ var cryptoCurrenciesSchema = mongoose.Schema({
 
         type: String,
         required: "Currency cann't be empty."
-    }, currency_symbol: {
+    },
+    currency_symbol: {
 
         type: String,
-    }, created_at: {
+    },created_at: {
 
         type: Date,
         default: Date.now
-    }, updated_at: {
+    },
+    updated_at: {
 
         type: Date,
         default: Date.now
     }
 });
-
 
 // Sets the created_at parameter equal to the current time
 cryptoCurrenciesSchema.pre('save', function(next) {
@@ -37,10 +37,3 @@ cryptoCurrenciesSchema.pre('save', function(next) {
 
 //Routes will go here
 module.exports = mongoose.model('cryptocurrencies', cryptoCurrenciesSchema);
-
-
-
-
-
-
-

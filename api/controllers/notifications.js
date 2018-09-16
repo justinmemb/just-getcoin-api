@@ -1,17 +1,10 @@
-//Files & Modules
-var email  = require('../../resources/email.js');
-var config = require('../../resources/config.js');
-var functions = require('../../resources/functions.js');
-var message = require('../../resources/messages.js');
-
-//Models
 var mongoose = require('mongoose');
 var users = mongoose.model('users');
-var offers = mongoose.model('offers');
 var notifications = mongoose.model('notifications');
-
-//Define ObjectId
-var object_id = mongoose.Types.ObjectId;
+var email  = require('../../config/email.js');
+var config = require('../../config/config.js');
+var message = require('../messages.js');
+var objectId = mongoose.Types.ObjectId; //Define ObjectId
 
 // #notifications
 exports.notificationList = function(request, response) {
@@ -46,7 +39,7 @@ exports.notificationList = function(request, response) {
         });
     } else {
 
-        if (object_id.isValid(id)) {
+        if (objectId.isValid(id)) {
 
             users.find({_id:id}, function(error, user) {
 
@@ -110,41 +103,6 @@ exports.notificationList = function(request, response) {
             });
         }
     }
-};
-
-// Create notification
-exports.createNotifications = function(sender, receiver, notification, offer, callback) {
-
-    //Generate sender notifcation
-    var generated_notification = {};
-    generated_notification['notification_by'] = sender;
-    generated_notification['notification_to'] = receiver;
-    generated_notification['offer'] = offer;
-    generated_notification['notification'] = notification;
-
-    var new_notification = new notifications(generated_notification);
-
-    new_notification.save(function(error, created_notification) {
-
-        var result;
-        if (error) {
-
-            result = {
-
-                error: true,
-                error: message.serverErrorOccurred
-            };
-            callback (result, null);
-        } else {
-
-            result = {
-
-                error: false,
-                message: message.notificationGenerated
-            };
-            callback (null, result);
-        }
-    });
 };
 
 // Format Notifications

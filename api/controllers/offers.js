@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var users = mongoose.model('users');
 var offers = mongoose.model('offers');
+var cryptocurrencies = mongoose.model('cryptocurrencies');
 var email  = require('../../config/email.js');
 var config = require('../../config/config.js');
 var message = require('../messages.js');
@@ -10,13 +11,16 @@ var objectId = mongoose.Types.ObjectId; //Define ObjectId
 exports.createOffer = function(request, response) {
 
     // Verify Required Parameters
-    var required_fields = ['user_id', 'amount', 'currency', 'unit', 'type'];
+    var required_fields = ['user_id', 'quantity', 'currency_id', 'type', 'location', 'latitude', 'longitude', 'exchange_rate'];
 
     var id = request.body.user_id;
-    var amount = request.body.amount;
-    var currency = request.body.currency;
-    var unit = request.body.unit;
+    var quantity = request.body.quantity;
+    var currency_id = request.body.currency_id;
     var type = request.body.type;
+    var location = request.body.location;
+    var latitude = request.body.latitude;
+    var longitude = request.body.longitude;
+    var rate = request.body.exchange_rate
 
     var error = false;
     var error_fields = "";
@@ -42,7 +46,8 @@ exports.createOffer = function(request, response) {
             "message" : 'Required field(s) ' + error_fields + 'is missing or empty!'
         });
     } else {
-        if (object_id.isValid(id)) {
+
+        if (objectId.isValid(id)) {
 
             users.find({_id:id}, function(error, user) {
 
@@ -55,61 +60,109 @@ exports.createOffer = function(request, response) {
                         error: message.serverErrorOccurred
                     });
                 } else {
+
                     if (user.length) {
 
-
-
                         // User exists
-                        var user_params = JSON.stringify(user[0]);
-                        var user_details = JSON.parse(user_params);
+                        if (objectId.isValid(currency_id)) {
 
-                        var feed = {
+                            cryptocurrencies.find({_id:currency_id}, function(error, currency) {
 
-                            feed_by: user_details['_id'],
-                            feed: feed_body
-                        };
-                        var new_feed = new feedbacks(feed);
+                                if (error) {
 
-                        new_feed.save(function(error, fee){
-                            if (error) {
+                                    response.json({
 
-                                response.json({
+                                        error: true,
+                                        error_description: error.message,
+                                        error: message.serverErrorOccurred
+                                    });
+                                } else {
 
-                                    error: true,
-                                    error_description: error.message,
-                                    error: message.serverErrorOccurred
-                                });
-                            } else {
-                                email.sendHtmlEmail(config.mail.feedbackemail, 'Feedback on '+ config.app.name +' by '+ user_details['name'] +'!', '<table width="100%" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="center"> <table width="500" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td colspan="2" height="15" align="center" style="font-size:1px;line-height:1px;">&nbsp;</td> </tr> <tr> <td colspan="2" height="15" align="center" style="font-size:1px;line-height:1px;">&nbsp;</td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table width="100%" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0"> <tbody> <tr> <td> <table width="500" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="center"> <table width="420" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> <tr> <td align="left" valign="top" style="font-size:17px; line-height:24px; font-family:Helvetica Neue, Arial, sans-serif; color:#666666; font-weight:normal;">' + feed.feed + '</td> </tr> <tr> <td align="left" height="15" valign="top" style="border-top:1px solid #e6e6e6;font-size:1px; line-height:1px;">&nbsp;</td> </tr> <tr> <td align="center" valign="top" style="font-size:17px; line-height:26px; font-family:Helvetica Neue, Arial, sans-serif; color:#666666; font-weight:normal;">Thank you for using '+config.app.name+'!</td> </tr> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table align="center" width="100%" bgcolor="#f2f2f2" cellpadding="0" cellspacing="0" border="0"> <tbody> <tr> <td align="center"> <table width="500" cellpadding="0" cellspacing="0" border="0" align="center"> <tbody> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> <tr> <td align="center" valign="top" style="font-family: Helvetica, arial, sans-serif; font-size: 13px; line-height: 20px;color: #7f7f7f; padding-left: 45px; padding-right: 45px">© 2018 '+config.app.name+'</td> </tr> <tr> <td align="left" height="15" valign="top" style="font-size:1px; line-height:1px;">&nbsp;</td> </tr> </tbody> </table> </td> </tr> </tbody> </table>');
+                                    if (currency.length) {
 
-                                response.json({
+                                        // Currency exists
+                                        var request_params = JSON.stringify(user[0]);
+                                        var user_details = JSON.parse(request_params);
 
-                                    error: false,
-                                    message: message.feedSaved
-                                });
+                                        var currency_params = JSON.stringify(currency[0]);
+                                        var currency_details = JSON.parse(currency_params);
 
-                            }
+                                        var offer_description = '';
+                                        if (type == 's') {
 
+                                            offer_description = user_details['name'] +" want to sell "+ quantity +" "+ currency_details['currency'] +" at "+ rate +" "+currency_details['currency_symbol'];
+                                        } else if (type == 'b') {
 
-                        });
-                       
-                        
+                                            offer_description = user_details['name']+ " want to buy "+ quantity +" "+ currency_details['currency'] +" at "+ rate +" "+currency_details['currency_symbol'];
+                                        }
+                                        var offer = {
 
-      
+                                            offer_by: user_details['_id'],
+                                            offer: offer_description,
+                                            quantity: parseInt(quantity),
+                                            currency: currency_details['currency'],
+                                            unit: currency_details['currency_symbol'],
+                                            offer_type: type,
+                                            location: location,
+                                            latitude: latitude,
+                                            longitude: longitude,
+                                            exchange_rate: rate
+                                        };
+
+                                        var new_offer = new offers(offer);
+                                        new_offer.coordinates = [ parseFloat(latitude), parseFloat(longitude) ];
+
+                                        new_offer.save(function(error, offer) {
+
+                                            if (error) {
+
+                                                response.json({
+
+                                                    error: true,
+                                                    error_description: error.message,
+                                                    message: message.serverErrorOccurred
+                                                });
+                                            } else {
+
+                                                response.json({
+
+                                                    error: false,
+                                                    message: message.offerCreated
+                                                });
+                                            }
+                                        });
+                                    } else {
+
+                                        // Currency not exists
+                                        response.json({
+
+                                            error: true,
+                                            message: message.invalidCurrency
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+
+                            // Currency not exists
+                            response.json({
+
+                                error: true,
+                                message: message.invalidCurrency
+                            });
+                        }
                     } else {
-                       // User not exists
-                       response.json({
+
+                        // User not exists
+                        response.json({
 
                             error: true,
                             message: message.invalidUser
-                        }); 
-                    } 
-
+                        });
+                    }
                 }
-               
-                
             });
-        } else{
+        } else {
 
             // User not exists
             response.json({
@@ -117,271 +170,114 @@ exports.createOffer = function(request, response) {
                 error: true,
                 message: message.invalidUser
             });
-        }                
-
-
+        }
     }
-
-
-
 };
 
+exports.offerList = function(request, response) {
 
+    // Verify Required Parameters
+    var required_fields = ['user_id'];
 
+    var id = request.query.user_id;
 
-exports.feedbackList = function(request, response) {
-   
-    feedback_controller.getAllFeedbacks(function (error, feedback_details) {
+    var error = false;
+    var error_fields = "";
 
-        if (error) {
+    var request_params = JSON.stringify(request.query);
+    var objectValue = JSON.parse(request_params);
 
-            response.json({
+    required_fields.forEach(function(element) {
 
-                error: true,
-                feedbacks: null,
-                message: message.serverErrorOccurred
-            });
-        } else {
+        if (!objectValue[element]) {
 
-            response.json({
-
-                error: false,
-                feedbacks: feedback_details['feedbacks'].sort({created_at:-1}),
-                message: message.feedListed
-            });
+            error = true;
+            error_fields += element + ', ';
         }
     });
 
+    if (error) {
 
+        // Required field(s) are missing or empty
+        response.json({
 
-};
-
-
-// Get all feedbacks
-// exports.getAllFeedbacks = function(callback) {
-
-//     var result;
-//     feedbacks.find({}, function(error, result_feeds) {
-
-//         if (error) {
-
-//             result = {
-
-//                 error: true,
-//                 error_description: error.message
-//             };
-//             return callback(result, null);
-//         } else {
-
-//             if (result_feeds.length > 0) {
-
-//                 var array_feeds = new Array();
-//                 var feedbackCount = 0;
-//                 result_feeds.forEach((currentFeed, index, array) => {
-
-//                     asyncFunction(currentFeed, (currentUser) => {
-
-//                         var feedback_details = {};
-//                         feedback_details['details'] = feedback_controller.formatFeedbacks(currentFeed);
-//                         feedback_details['user'] = users_controller.formatUsers(currentUser, false);
-//                         array_feeds.push(feedback_details);
-//                         feedbackCount++;
-
-//                         if (feedbackCount === array.length) {
-
-//                             result = {
-
-//                                 error: false,
-//                                 feedbacks: array_feeds
-//                             };
-//                             return callback(null, result);
-//                         }
-//                     });
-//                 });
-//             } else {
-
-//                 result = {
-
-//                     error: false,
-//                     feedbacks: new Array()
-//                 };
-//                 return callback(null, result);
-//             }
-//         }
-//     }).sort({created_at:-1});
-// };
-exports.getAllFeedbacks = function(callback) {
-
-    var result;
-    feedbacks.find({}, function(error, result_feeds) {
-
-        if (error) {
-
-            result = {
-
-                error: true,
-                error_description: error.message
-            };
-            return callback(result, null);
-        } else {
-
-            if (result_feeds.length > 0) {
-
-                var array_feeds = new Array();
-                var feedbackCount = 0;
-                result_feeds.forEach((currentFeed, index, array) => {
-
-                    asyncFunction(currentFeed, (currentUser) => {
-
-                    var feedback_details = {};
-                    feedback_details['details'] = feedback_controller.formatFeedbacks(currentFeed);
-                    feedback_details['user'] = users_controller.formatUsers(currentUser, false);
-                    array_feeds.push(feedback_details);
-                    feedbackCount++;
-
-                    if (feedbackCount === array.length) {
-
-                        result = {
-
-                            error: false,
-                            feedbacks: array_feeds
-                        };
-                        return callback(null, result);
-                    }
-                });
-            });
-            } else {
-
-                result = {
-
-                    error: false,
-                    feedbacks: new Array()
-                };
-                return callback(null, result);
-            }
-        }
-    }).sort({created_at:-1});
-};
-// Format Feedback
-exports.formatFeedbacks = function (feed) {
-
-    var feed_params = JSON.stringify(feed);
-    var feed_details = JSON.parse(feed_params);
-
-    var feed_id = feed_details['_id'];
-
-    var feed = {
-
-        feed_id: feed_id,
-        feed_by: feed_details['feed_by'],
-        feed: feed_details['feed'],
-        created_at: feed_details['created_at'],
-        updated_at: feed_details['updated_at'],
-    };
-
-    return feed;
-}
-
-// Users offers
-exports.getUserOffers = function(user_id, latitude, longitude, distance, callback) {
-
-    var query = offers.find({'type':'Point', offer_by:user_id}).sort({created_by:-1});
-
-    // Include filter by Max Distance
-    if (distance) {
-
-        // Using MongoDB's geospatial querying features.
-        query = query.where('coordinates').near({
-            center: {
-                type: 'Point',
-                coordinates: [latitude, longitude]
-            },
-            // Converting meters to miles
-            maxDistance: distance * 1609.34,
-            spherical: true
+            "error" : true,
+            "message" : 'Required field(s) ' + error_fields + 'is missing or empty!'
         });
-    }
-
-    // Execute Query and Return the Query Results
-    query.exec(function(error, result_offers) {
-
-        if (error) {
-
-            return callback(error, null);
-        } else {
-
-            var array_offers = new Array();
-            for (var i = 0; i < result_offers.length; i++) {
-
-                array_offers.push(offers_controller.formatOffers(result_offers[i]));
-            }
-
-            users_controller.getUserById(user_id, function (error, user_details) {
-
-                var offers_details = {};
-                offers_details['details'] = users_controller.formatUsers(user_details, false),
-                offers_details['offers'] = array_offers
-                return callback(null, offers_details);
-            });
-        }
-    });
-};
-
-
-
-// Get offer by id
-exports.getOfferById = function(offer_id, callback) {
-
-    var result;
-    if (object_id.isValid(offer_id)) {
-
-        offers.find({_id:offer_id}, function(error, offer) {
-
-            if (error) {
-
-                result = {
-
-                    error: true,
-                    message: message.serverErrorOccurred
-                };
-                return callback(result, null);
-            } else {
-
-                if (offer.length) {
-
-                    // Offer exists
-                    return callback(null , offers_controller.formatOffers(offer[0]));
-                } else {
-
-                    // Offer not exists
-                    result = {
-                        error: true,
-                        message: message.invalidOffer
-                    };
-                    return callback(result, null);
-                }
-            }
-        });
-
-
-
     } else {
 
-        // User not exists
-        result = {
+        if (objectId.isValid(id)) {
 
-            error: true,
-            message: message.invalidUser
-        };
-        return callback(result, null);
+            users.find({_id:id}, function(error, user) {
+
+                if (error) {
+
+                    response.json({
+
+                        error: true,
+                        error_description: error.message,
+                        message: message.serverErrorOccurred
+                    });
+                } else {
+
+                    if (user.length) {
+
+                        // User exists
+                        offers.find({offer_by:id}, function(error, offers) {
+
+                            if (error) {
+
+                                response.json({
+
+                                    error: true,
+                                    error_description: error.message,
+                                    message: message.serverErrorOccurred
+                                });
+                            } else {
+
+                                var array_offers = new Array();
+                                for (var i = 0; i < offers.length; i++) {
+
+                                    array_offers.push(formatOffers(offers[i]));
+                                }
+
+                                response.json({
+
+                                    error: false,
+                                    offers: array_offers,
+                                    message: message.offerListed
+                                });
+                            }
+                        });
+                    } else {
+
+                        // User not exists
+                        response.json({
+
+                            error: true,
+                            message: message.invalidUser
+                        });
+                    }
+                }
+            });
+        } else {
+
+            // User not exists
+            response.json({
+
+                error: true,
+                message: message.invalidUser
+            });
+        }
     }
 };
 
 // Format Offers
-exports.formatOffers = function (offer) {
+function formatOffers (offer) {
 
     var offer_params = JSON.stringify(offer);
     var offer_details = JSON.parse(offer_params);
+    console.log(offer_details);
 
     var offer_id = offer_details['_id'];
 

@@ -3,7 +3,7 @@ var configuration = {
     development: {
         app: {
 
-            name: 'Get Coin',
+            name: 'GetCoins',
         }, server: {
 
             url: 'http://localhost:8585/',
@@ -22,7 +22,7 @@ var configuration = {
     production: {
         app: {
 
-            name: 'Get Coin',
+            name: 'GetCoins',
         }, server: {
 
             url: 'https://getcoins.herokuapp.com/',

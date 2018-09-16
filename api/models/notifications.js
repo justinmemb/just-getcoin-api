@@ -8,9 +8,6 @@ var notificationsSchema = mongoose.Schema({
         type: String,
         required: "User for which notifcation cann't be empty."
     },
-   
-    
-    
     notification_to: {
 
         type: String,

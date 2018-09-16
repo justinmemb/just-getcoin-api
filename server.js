@@ -34,6 +34,7 @@ var usersModel  = require('./api/models/users.js');
 var feedbacksModel  = require('./api/models/feedbacks.js');
 var notificationsModel  = require('./api/models/notifications.js');
 var offersModel  = require('./api/models/offers.js');
+var cryptoCurrenciesModel  = require('./api/models/cryptocurrencies.js');
 
 //Importing router
 var usersRoute  = require('./api/routes/routes.js');
@@ -48,6 +49,7 @@ app.use(function(error, request, response) {
     response.json({
 
         "error" : true,
+        "error_description" : error.message,
         "message" : message.somethingWrong
     });
 });
@@ -57,6 +59,7 @@ app.use(function(error, request, response, next) {
     response.json({
 
         "error" : true,
+        "error_description" : error.message,
         "message" : message.invalidURL
     });
 });
