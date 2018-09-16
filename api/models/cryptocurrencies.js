@@ -1,37 +1,30 @@
 'use strict';
+//Models
 var mongoose = require('mongoose');
 
-//notifications
-var notificationsSchema = mongoose.Schema({
-    notification_by: {
+// cryptocurrencies
+var cryptoCurrenciesSchema = mongoose.Schema({
+    currency: {
 
         type: String,
-        required: "User for which notifcation cann't be empty."
-    },
-   
-    
-    
-    notification_to: {
+        required: "Currency cann't be empty."
+    }, currency_symbol: {
 
         type: String,
-    },
-    notification: {
-
-        type: String,
-    },created_at: {
+    }, created_at: {
 
         type: Date,
         default: Date.now
-    },
-    updated_at: {
+    }, updated_at: {
 
         type: Date,
         default: Date.now
     }
 });
 
+
 // Sets the created_at parameter equal to the current time
-notificationsSchema.pre('save', function(next) {
+cryptoCurrenciesSchema.pre('save', function(next) {
 
     var now = new Date();
     this.updated_at = now;
@@ -43,4 +36,11 @@ notificationsSchema.pre('save', function(next) {
 });
 
 //Routes will go here
-module.exports = mongoose.model('notifications', notificationsSchema);
+module.exports = mongoose.model('cryptocurrencies', cryptoCurrenciesSchema);
+
+
+
+
+
+
+
