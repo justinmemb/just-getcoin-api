@@ -726,7 +726,7 @@ exports.confirmMeetingAction = function(request, response) {
                             });
                         } else {
 
-                            // Receiver not exists
+                             // Receiver not exists
                             response.json({
 
                                 error: true,
@@ -962,7 +962,26 @@ exports.getChat = function (sender, receiver, callback) {
     }).sort({created_at:1});
 };
 
+// Format Chats
+function formatChats (chat) {
 
+    var chat_params = JSON.stringify(chat);
+    var chat_details = JSON.parse(chat_params);
+
+    var chat_id = chat_details['_id'];
+
+    var chat = {
+
+        chat_id: chat_id,
+        for_user: chat_details['for_user'],
+        to_user: chat_details['to_user'],
+        body: chat_details['body'],
+        created_at: chat_details['created_at'],
+        updated_at: chat_details['updated_at'],
+    };
+
+    return chat;
+}
 
 
 
